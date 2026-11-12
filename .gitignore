@@ -1,0 +1,21 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Large genomic files (keep mock scripts, ignore generated gigabyte FASTA files)
+data/generated/
+*.fasta
+*.fa
+
+# OS & Editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
