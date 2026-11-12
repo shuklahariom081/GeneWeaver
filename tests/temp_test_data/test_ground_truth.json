@@ -1,0 +1,195 @@
+{
+  "metadata": {
+    "chromosome": "chrTest",
+    "total_base_pairs": 100000,
+    "num_injected_sites": 13,
+    "guides_tested": [
+      "GAGTCCGAGCAGAAGAAGAA"
+    ]
+  },
+  "sites": [
+    {
+      "chromosome": "chrTest",
+      "position": 95000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGTCCGAGCAGAAGAAGAACGG",
+      "spacer_sequence": "GAGTCCGAGCAGAAGAAGAA",
+      "pam": "CGG",
+      "mismatches": 0,
+      "mutated_indices": [],
+      "site_type": "on_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 9000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGTCCGAGCAGACGTAGAAAAG",
+      "spacer_sequence": "GAGTCCGAGCAGACGTAGAA",
+      "pam": "AAG",
+      "mismatches": 2,
+      "mutated_indices": [
+        13,
+        15
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 23000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGTCCGTTCCGAAGAAGAAAGG",
+      "spacer_sequence": "GAGTCCGTTCCGAAGAAGAA",
+      "pam": "AGG",
+      "mismatches": 3,
+      "mutated_indices": [
+        7,
+        8,
+        10
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 81000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGTCTGAGCAGAAGTAAAAGGG",
+      "spacer_sequence": "GAGTCTGAGCAGAAGTAAAA",
+      "pam": "GGG",
+      "mismatches": 3,
+      "mutated_indices": [
+        5,
+        15,
+        17
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 27000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGTTCGAGCAGACTAAGAAGGG",
+      "spacer_sequence": "GAGTTCGAGCAGACTAAGAA",
+      "pam": "GGG",
+      "mismatches": 3,
+      "mutated_indices": [
+        4,
+        13,
+        14
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 73000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GGGTCCGAGCAGAAGTAGGAGGG",
+      "spacer_sequence": "GGGTCCGAGCAGAAGTAGGA",
+      "pam": "GGG",
+      "mismatches": 3,
+      "mutated_indices": [
+        1,
+        15,
+        18
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 43000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "CAGTCCAAGCAGAAGAAGAATGG",
+      "spacer_sequence": "CAGTCCAAGCAGAAGAAGAA",
+      "pam": "TGG",
+      "mismatches": 2,
+      "mutated_indices": [
+        0,
+        6
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 55000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGTCCGAGCAGAAGAATAACGG",
+      "spacer_sequence": "GAGTCCGAGCAGAAGAATAA",
+      "pam": "CGG",
+      "mismatches": 1,
+      "mutated_indices": [
+        17
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 35000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGTCAGCGCAGCAGAAGAAGGG",
+      "spacer_sequence": "GAGTCAGCGCAGCAGAAGAA",
+      "pam": "GGG",
+      "mismatches": 3,
+      "mutated_indices": [
+        5,
+        7,
+        12
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 47000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAATCCGAGCAGAAGAAGAACGG",
+      "spacer_sequence": "GAATCCGAGCAGAAGAAGAA",
+      "pam": "CGG",
+      "mismatches": 1,
+      "mutated_indices": [
+        2
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 49000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGTCCGTGCAGAAAAAGAAGGG",
+      "spacer_sequence": "GAGTCCGTGCAGAAAAAGAA",
+      "pam": "GGG",
+      "mismatches": 2,
+      "mutated_indices": [
+        7,
+        14
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 39000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGACCGAGGAGAAAAAGAAGGG",
+      "spacer_sequence": "GAGACCGAGGAGAAAAAGAA",
+      "pam": "GGG",
+      "mismatches": 3,
+      "mutated_indices": [
+        3,
+        9,
+        14
+      ],
+      "site_type": "off_target"
+    },
+    {
+      "chromosome": "chrTest",
+      "position": 69000,
+      "guide": "GAGTCCGAGCAGAAGAAGAA",
+      "target_sequence": "GAGTCCGACCAGAAGAACAAGGG",
+      "spacer_sequence": "GAGTCCGACCAGAAGAACAA",
+      "pam": "GGG",
+      "mismatches": 2,
+      "mutated_indices": [
+        8,
+        17
+      ],
+      "site_type": "off_target"
+    }
+  ]
+}
