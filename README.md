@@ -18,10 +18,11 @@ By replacing standard single-threaded Python string matching loops with Just-In-
 * **Genomic Parser (`engine/parser.py`)**: Streams and cleanses large `.fasta` files using BioPython and converts sequences into compact numeric arrays (`uint8` / 2-bit encoding).
 * **CPU Baseline Engine (`engine/cpu_baseline.py`)**: Reference sliding-window string alignment algorithm in pure Python to measure baseline throughput (Mbp/s).
 * **CUDA Kernel Engine (`engine/cuda_kernels.py`)**: Custom Numba `@cuda.jit` kernels executing massively parallel base-pair comparisons across GPU threads and blocks.
-* **CUDA Shared Memory Optimizer (`engine/cuda_shared_mem.py`)**: Cooperative tile loading into on-chip shared memory cache to minimize global VRAM latency.
-* **Biological Scoring Matrix (`engine/scoring.py`)**: Distance-weighted mismatch penalties (seed region vs. distal region) and PAM motif recognition (`NGG` / `NAG`).
-* **Distributed Scheduler (`engine/distributed.py`)**: Dask orchestration for chunk partitioning across CPU/GPU workers.
-* **TUI Dashboard (`ui/app.py`)**: Terminal User Interface built with Textual displaying live VRAM allocation, GPU core utilization, throughput, and sequence mismatch viewers.
+* **Input Validator (`engine/validators.py`)**: Validates guide lengths, RNA-to-DNA U$\to$T translation, and IUPAC nucleotide conformance.
+* **Hardware Telemetry (`engine/telemetry.py`)**: Real-time GPU VRAM, compute capability, and PCIe bandwidth profiler.
+* **Engine Configuration (`engine/config.py`)**: Centralized biological parameters, CUDA thread block sizing, and memory margins.
+* **TUI Dashboard (`ui/app.py` & `ui/widgets.py`)**: Terminal User Interface built with Textual displaying live VRAM allocation, GPU core utilization, throughput, and sequence mismatch viewers.
+
 
 ---
 
