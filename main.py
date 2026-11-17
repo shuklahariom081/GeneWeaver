@@ -1,19 +1,31 @@
 """
-GeneWeaver - CLI Driver & Week 1 Runner
+GeneWeaver - CLI Driver & Alignment Runner (Week 1 & 2)
 GPU-Accelerated CRISPR Alignment Engine
 """
 
 import argparse
 import os
 import sys
+import time
+import warnings
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
 
+# Suppress JIT compiler notice warnings
+warnings.filterwarnings("ignore")
+
+
 from data.mock_genome_generator import generate_mock_genome
 from engine.parser import FastAStreamParser
 from engine.cpu_baseline import CPUBaselineAligner
+
+try:
+    from engine.cuda_kernels import CUDAAlignmentEngine
+    CUDA_AVAILABLE = True
+except Exception:
+    CUDA_AVAILABLE = False
 
 console = Console()
 
@@ -34,32 +46,44 @@ def print_banner():
     console.print(Panel(banner, border_style="cyan"))
 
 
-def run_week1_pipeline(
+def run_alignment_pipeline(
     fasta_path: str,
     guide_seq: str,
+    engine_type: str = "cuda",
     max_mismatches: int = 3,
     allow_nag: bool = True,
-    chunk_size: int = 100_000,
+    chunk_size: int = 250_000,
 ):
     print_banner()
 
     console.print(f"[bold green]▶ Target Guide RNA:[/bold green] [yellow]{guide_seq}[/yellow] (20 bp)")
     console.print(f"[bold green]▶ Max Mismatches:[/bold green]  [yellow]{max_mismatches}[/yellow]")
     console.print(f"[bold green]▶ PAM Motif:[/bold green]       [yellow]NGG{' & NAG' if allow_nag else ''}[/yellow]")
-    console.print(f"[bold green]▶ Target FASTA:[/bold green]     [cyan]{fasta_path}[/cyan]\n")
+    console.print(f"[bold green]▶ Target FASTA:[/bold green]     [cyan]{fasta_path}[/cyan]")
+
+    # Select and initialize engine
+    if engine_type == "cuda":
+        if not CUDA_AVAILABLE:
+            console.print("[bold red]CUDA requested but unavailable. Falling back to CPU baseline.[/bold red]")
+            engine = CPUBaselineAligner(guide_sequence=guide_seq, max_mismatches=max_mismatches, allow_nag_pam=allow_nag)
+            engine_name = "Pure Python CPU Baseline"
+        else:
+            engine = CUDAAlignmentEngine(guide_sequence=guide_seq, max_mismatches=max_mismatches, allow_nag_pam=allow_nag)
+            free_b, total_b = engine.get_vram_info()
+            console.print(f"[bold green]▶ Hardware Engine:[/bold green]  [bold cyan]{engine.device_name}[/bold cyan] (Compute {engine.compute_cap[0]}.{engine.compute_cap[1]})")
+            console.print(f"[bold green]▶ VRAM Status:[/bold green]      [yellow]{free_b / 1024**2:.1f} MB Free[/yellow] / [dim]{total_b / 1024**2:.1f} MB Total[/dim]\n")
+            engine_name = f"Numba CUDA Engine ({engine.device_name})"
+    else:
+        engine = CPUBaselineAligner(guide_sequence=guide_seq, max_mismatches=max_mismatches, allow_nag_pam=allow_nag)
+        engine_name = "Pure Python CPU Baseline"
+        console.print(f"[bold green]▶ Hardware Engine:[/bold green]  [yellow]CPU Baseline (Single-Threaded)[/yellow]\n")
 
     parser = FastAStreamParser(fasta_path, chunk_size=chunk_size, overlap_size=22)
     summary = parser.get_summary()
 
     console.print(f"[bold blue]ℹ Genomic Summary:[/bold blue] {len(summary['chromosomes'])} chromosome(s), {summary['total_base_pairs']:,} base pairs total.")
 
-    aligner = CPUBaselineAligner(
-        guide_sequence=guide_seq,
-        max_mismatches=max_mismatches,
-        allow_nag_pam=allow_nag,
-    )
-
-    console.print("\n[bold yellow]⚡ Running Pure Python CPU Baseline Aligner...[/bold yellow]")
+    console.print(f"\n[bold yellow]⚡ Launching Alignment via {engine_name}...[/bold yellow]")
 
     with Progress(
         SpinnerColumn(),
@@ -69,15 +93,14 @@ def run_week1_pipeline(
         TimeElapsedColumn(),
         console=console,
     ) as progress:
-        task = progress.add_task("[cyan]Scanning DNA chunks...", total=summary["total_base_pairs"])
+        task = progress.add_task("[cyan]Processing sequence chunks...", total=summary["total_base_pairs"])
 
         all_hits = []
         total_bp = 0
-        import time
         start_t = time.perf_counter()
 
         for chunk in parser.stream_chunks():
-            chunk_hits = aligner.align_chunk(chunk)
+            chunk_hits = engine.align_chunk(chunk)
             all_hits.extend(chunk_hits)
             scanned = chunk.length - chunk.overlap_size if total_bp > 0 else chunk.length
             total_bp += scanned
@@ -90,7 +113,7 @@ def run_week1_pipeline(
     # Display Results Table
     console.print("\n[bold green]✔ Alignment Scan Complete![/bold green]\n")
 
-    perf_table = Table(title="CPU Baseline Benchmark Results", border_style="cyan")
+    perf_table = Table(title=f"{engine_name} Benchmark Results", border_style="cyan")
     perf_table.add_column("Metric", style="bold white")
     perf_table.add_column("Value", style="bold yellow")
 
@@ -110,13 +133,10 @@ def run_week1_pipeline(
         hits_table.add_column("Mismatches", style="red")
         hits_table.add_column("Type", style="italic")
 
-        # Sort hits by mismatches (on-target first)
         sorted_hits = sorted(all_hits, key=lambda h: (h.mismatches, h.position))
 
         for hit in sorted_hits[:15]:
             site_type = "[bold green]ON-TARGET[/bold green]" if hit.mismatches == 0 else f"[yellow]OFF-TARGET ({hit.mismatches} mut)[/yellow]"
-            
-            # Format sequence with highlight
             spacer_str = hit.spacer_sequence
             pam_str = f"[bold green]{hit.pam}[/bold green]"
             seq_display = f"{spacer_str} {pam_str}"
@@ -139,10 +159,12 @@ def main():
     parser = argparse.ArgumentParser(description="GeneWeaver: GPU-Accelerated CRISPR Alignment Engine")
     parser.add_argument("--fasta", type=str, default=None, help="Path to input .fasta file")
     parser.add_argument("--guide", type=str, default=DEFAULT_GUIDE, help="20bp CRISPR guide RNA sequence")
+    parser.add_argument("--engine", type=str, choices=["cuda", "cpu"], default="cuda", help="Execution engine (cuda or cpu)")
     parser.add_argument("--max-mismatches", type=int, default=3, help="Max allowable mismatches in spacer (default: 3)")
     parser.add_argument("--no-nag", action="store_true", help="Disallow non-canonical NAG PAMs")
     parser.add_argument("--gen-mock", action="store_true", help="Generate a mock genome before running")
     parser.add_argument("--mock-bp", type=int, default=1_000_000, help="Number of base pairs for mock genome (default: 1,000,000)")
+    parser.add_argument("--tui", action="store_true", help="Launch interactive Textual TUI dashboard")
 
     args = parser.parse_args()
 
@@ -165,12 +187,17 @@ def main():
     else:
         target_fasta = args.fasta
 
-    run_week1_pipeline(
-        fasta_path=target_fasta,
-        guide_seq=args.guide,
-        max_mismatches=args.max_mismatches,
-        allow_nag=not args.no_nag,
-    )
+    if args.tui:
+        from ui.app import launch_tui
+        launch_tui(target_fasta, guide_seq=args.guide)
+    else:
+        run_alignment_pipeline(
+            fasta_path=target_fasta,
+            guide_seq=args.guide,
+            engine_type=args.engine,
+            max_mismatches=args.max_mismatches,
+            allow_nag=not args.no_nag,
+        )
 
 
 if __name__ == "__main__":

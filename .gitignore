@@ -11,8 +11,11 @@ __pycache__/
 
 # Large genomic files (keep mock scripts, ignore generated gigabyte FASTA files)
 data/generated/
+tests/benchmark_data/
+tests/temp_test_data*/
 *.fasta
 *.fa
+
 
 # OS & Editor files
 .vscode/
